@@ -3,9 +3,9 @@
 > [!IMPORTANT]
 > **Disclaimer:** This is an independent, community-built project. It is **not affiliated with, associated with, endorsed by, or supported by Polestar** in any way. "Polestar" is a trademark of its respective owner and is used here only to describe compatibility. This project relies on unofficial, reverse-engineered APIs that may break at any time. Use at your own risk.
 
-MCP server for controlling your Polestar from Claude — climate, charging, locks, location and vehicle status via natural language.
+MCP server for controlling your Polestar from any MCP-capable AI assistant — Claude, ChatGPT/Codex, Gemini, and others. Climate, charging, locks, location and vehicle status via natural language.
 
-unofficial-polestar-mcp is a Model Context Protocol server that connects Claude to your Polestar. Ask Claude to precondition the cabin, set charge limits, check battery and range, find where you parked, or flash the lights — all through the same cloud APIs the official app uses. Safety-critical actions (unlock, open windows) require explicit confirmation. Built on the [unofficial-polestar-api](https://github.com/kildahldev/unofficial-polestar-api) library. Not affiliated with Polestar.
+unofficial-polestar-mcp is a [Model Context Protocol](https://modelcontextprotocol.io) server that connects AI assistants to your Polestar. Ask your assistant to precondition the cabin, set charge limits, check battery and range, find where you parked, or flash the lights — all through the same cloud APIs the official app uses. Safety-critical actions (unlock, open windows) are disabled by default and require explicit confirmation. Built on the [unofficial-polestar-api](https://github.com/kildahldev/unofficial-polestar-api) library. Not affiliated with Polestar.
 
 ## Tools
 
@@ -64,6 +64,10 @@ The server authenticates with your Polestar account credentials via environment 
 
 Tokens are cached on disk (mode `0600` on macOS/Linux; on Windows the file inherits your user profile's ACLs) so restarts reuse the refresh token instead of re-running the full login.
 
+## Client setup
+
+This is a standard stdio MCP server — it works with any MCP-capable client and is not tied to a specific AI provider.
+
 ### Claude Desktop (macOS / Windows)
 
 Add to your Claude Desktop config file:
@@ -102,6 +106,45 @@ claude mcp add polestar \
 
 On Windows, point to `.venv\Scripts\polestar-mcp.exe` instead.
 
+### OpenAI Codex CLI
+
+Add to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.polestar]
+command = "/path/to/unofficial-polestar-mcp/.venv/bin/polestar-mcp"
+env = { POLESTAR_EMAIL = "you@example.com", POLESTAR_PASSWORD = "your-password" }
+```
+
+(ChatGPT's own connector support is limited to remote MCP servers; for local stdio servers like this one, use Codex CLI or another desktop client.)
+
+### Gemini CLI
+
+Add to `~/.gemini/settings.json` (or `.gemini/settings.json` in a project):
+
+```json
+{
+  "mcpServers": {
+    "polestar": {
+      "command": "/path/to/unofficial-polestar-mcp/.venv/bin/polestar-mcp",
+      "env": {
+        "POLESTAR_EMAIL": "you@example.com",
+        "POLESTAR_PASSWORD": "your-password"
+      }
+    }
+  }
+}
+```
+
+### Other MCP clients (Cursor, VS Code, Windsurf, …)
+
+The same `command` + `env` configuration shape works for VS Code Copilot, Cursor, Windsurf, and any other MCP client.
+
+Notes that apply to every client:
+
+- The `POLESTAR_ENABLE_UNLOCK` gate is enforced by the server itself, so it protects you regardless of client or model.
+- The `readOnlyHint`/`destructiveHint` tool annotations are hints — clients differ in whether they surface them. Keep per-tool confirmation enabled and avoid auto-approve/YOLO modes with this server.
+
 ## Example prompts
 
 - "How charged is my Polestar and what's the range?"
@@ -114,7 +157,7 @@ On Windows, point to `.venv\Scripts\polestar-mcp.exe` instead.
 
 - **Exposure tools are opt-in.** `unlock_car`, `unlock_trunk`, and `open_windows` are not available at all unless you start the server with `POLESTAR_ENABLE_UNLOCK=1`. This is an environment-level switch that a prompt-injected model cannot flip.
 - **Do not blanket-auto-approve this server's tools in your MCP client.** The in-tool `confirm=true` step is a courtesy prompt for the model, not a security boundary — anything the model reads (web pages, emails, documents) could try to talk it into passing `confirm=true`. Your client's per-call tool approval is the real gate for destructive actions; the tools are annotated (`readOnlyHint`/`destructiveHint`) so clients can distinguish safe reads from vehicle commands.
-- Vehicle data returned by tools (location, VIN, registration) enters the model context and is processed under your Claude plan's data policy.
+- Vehicle data returned by tools (location, VIN, registration) enters the model context and is processed under your AI provider's data policy — whichever assistant you connect (Claude, ChatGPT, Gemini, …).
 - This project uses unofficial, reverse-engineered APIs. They can break or change at any time. Use at your own risk.
 - Not affiliated with, endorsed by, or supported by Polestar.
 
