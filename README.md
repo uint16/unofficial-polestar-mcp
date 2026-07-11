@@ -18,7 +18,9 @@ unofficial-polestar-mcp is a Model Context Protocol server that connects Claude 
 | Locks | `lock_car`, `unlock_car`*, `unlock_trunk`*, `honk_and_flash` |
 | Windows | `open_windows`*, `close_windows` |
 
-\* Requires explicit user confirmation (`confirm=true`) before the command is sent.
+\* **Disabled by default.** Tools that expose the vehicle (unlock, unlock trunk, open windows) are only registered when the server is started with `POLESTAR_ENABLE_UNLOCK=1`, and additionally ask for confirmation (`confirm=true`) before sending the command.
+
+All tools carry MCP annotations: status tools are marked `readOnlyHint`, exposure tools `destructiveHint`, so MCP clients can prompt accordingly.
 
 If your account has a single vehicle it is selected automatically; otherwise pass a `vin` argument or set `POLESTAR_VIN`.
 
@@ -58,6 +60,7 @@ The server authenticates with your Polestar account credentials via environment 
 | `POLESTAR_PASSWORD` | yes | Polestar account password |
 | `POLESTAR_VIN` | no | Default vehicle when the account has several |
 | `POLESTAR_TOKEN_FILE` | no | Token cache path (default `~/.polestar-mcp/tokens.json`) |
+| `POLESTAR_ENABLE_UNLOCK` | no | Set to `1` to register the `unlock_car`, `unlock_trunk`, and `open_windows` tools (off by default) |
 
 Tokens are cached on disk (mode `0600` on macOS/Linux; on Windows the file inherits your user profile's ACLs) so restarts reuse the refresh token instead of re-running the full login.
 
@@ -109,7 +112,9 @@ On Windows, point to `.venv\Scripts\polestar-mcp.exe` instead.
 
 ## Safety & disclaimer
 
-- Unlocking the car or trunk and opening windows are gated behind an explicit confirmation step — Claude must ask you before sending those commands.
+- **Exposure tools are opt-in.** `unlock_car`, `unlock_trunk`, and `open_windows` are not available at all unless you start the server with `POLESTAR_ENABLE_UNLOCK=1`. This is an environment-level switch that a prompt-injected model cannot flip.
+- **Do not blanket-auto-approve this server's tools in your MCP client.** The in-tool `confirm=true` step is a courtesy prompt for the model, not a security boundary — anything the model reads (web pages, emails, documents) could try to talk it into passing `confirm=true`. Your client's per-call tool approval is the real gate for destructive actions; the tools are annotated (`readOnlyHint`/`destructiveHint`) so clients can distinguish safe reads from vehicle commands.
+- Vehicle data returned by tools (location, VIN, registration) enters the model context and is processed under your Claude plan's data policy.
 - This project uses unofficial, reverse-engineered APIs. They can break or change at any time. Use at your own risk.
 - Not affiliated with, endorsed by, or supported by Polestar.
 
