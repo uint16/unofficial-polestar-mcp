@@ -26,12 +26,27 @@ If your account has a single vehicle it is selected automatically; otherwise pas
 
 Requires Python 3.11+.
 
+**macOS / Linux:**
+
 ```sh
 git clone https://github.com/<you>/unofficial-polestar-mcp
 cd unofficial-polestar-mcp
 python3 -m venv .venv
 .venv/bin/pip install -e .
 ```
+
+The server binary is at `.venv/bin/polestar-mcp`.
+
+**Windows (PowerShell):**
+
+```powershell
+git clone https://github.com/<you>/unofficial-polestar-mcp
+cd unofficial-polestar-mcp
+python -m venv .venv
+.venv\Scripts\pip install -e .
+```
+
+The server binary is at `.venv\Scripts\polestar-mcp.exe`.
 
 ## Configuration
 
@@ -44,11 +59,14 @@ The server authenticates with your Polestar account credentials via environment 
 | `POLESTAR_VIN` | no | Default vehicle when the account has several |
 | `POLESTAR_TOKEN_FILE` | no | Token cache path (default `~/.polestar-mcp/tokens.json`) |
 
-Tokens are cached on disk (mode `0600`) so restarts reuse the refresh token instead of re-running the full login.
+Tokens are cached on disk (mode `0600` on macOS/Linux; on Windows the file inherits your user profile's ACLs) so restarts reuse the refresh token instead of re-running the full login.
 
-### Claude Desktop
+### Claude Desktop (macOS / Windows)
 
-Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+Add to your Claude Desktop config file:
+
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 
 ```json
 {
@@ -64,7 +82,13 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 }
 ```
 
-### Claude Code
+On Windows, use the `Scripts` binary and escape backslashes in JSON:
+
+```json
+"command": "C:\\path\\to\\unofficial-polestar-mcp\\.venv\\Scripts\\polestar-mcp.exe"
+```
+
+### Claude Code (macOS / Linux / Windows)
 
 ```sh
 claude mcp add polestar \
@@ -72,6 +96,8 @@ claude mcp add polestar \
   -e POLESTAR_PASSWORD=your-password \
   -- /path/to/unofficial-polestar-mcp/.venv/bin/polestar-mcp
 ```
+
+On Windows, point to `.venv\Scripts\polestar-mcp.exe` instead.
 
 ## Example prompts
 
