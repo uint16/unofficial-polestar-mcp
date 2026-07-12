@@ -1,0 +1,72 @@
+{
+  "manifest_version": "0.2",
+  "name": "unofficial-polestar-mcp",
+  "display_name": "Unofficial Polestar",
+  "version": "0.1.0",
+  "description": "Control your Polestar: climate, charging, locks, location and vehicle status. Not affiliated with Polestar.",
+  "long_description": "Unofficial MCP server that connects AI assistants to your Polestar — precondition the cabin, set charge limits, check battery and range, find where you parked, or flash the lights. Tools that expose the vehicle (unlock, open windows) are disabled unless explicitly enabled. Independent community project, not affiliated with, endorsed by, or supported by Polestar. Requires uv (https://docs.astral.sh/uv/) to be installed.",
+  "author": {
+    "name": "Damas"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uint16/unofficial-polestar-mcp"
+  },
+  "homepage": "https://github.com/uint16/unofficial-polestar-mcp",
+  "license": "MIT",
+  "keywords": ["polestar", "ev", "car", "charging", "climate", "vehicle"],
+  "server": {
+    "type": "python",
+    "entry_point": "src/polestar_mcp/server.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--no-project",
+        "--with",
+        "mcp==1.28.1",
+        "--with",
+        "unofficial-polestar-api==0.3.0",
+        "${__dirname}/src/polestar_mcp/server.py"
+      ],
+      "env": {
+        "POLESTAR_EMAIL": "${user_config.email}",
+        "POLESTAR_PASSWORD": "${user_config.password}",
+        "POLESTAR_VIN": "${user_config.vin}",
+        "POLESTAR_ENABLE_UNLOCK": "${user_config.enable_unlock}"
+      }
+    }
+  },
+  "user_config": {
+    "email": {
+      "type": "string",
+      "title": "Polestar account email",
+      "description": "The email you use to sign in to the Polestar app",
+      "required": true
+    },
+    "password": {
+      "type": "string",
+      "title": "Polestar account password",
+      "description": "Stored in your OS keychain by the MCP client",
+      "sensitive": true,
+      "required": true
+    },
+    "vin": {
+      "type": "string",
+      "title": "Default VIN",
+      "description": "Only needed if your account has multiple vehicles",
+      "required": false,
+      "default": ""
+    },
+    "enable_unlock": {
+      "type": "boolean",
+      "title": "Enable unlock / open-windows tools",
+      "description": "Registers unlock_car, unlock_trunk and open_windows. Leave off unless you need them, and never auto-approve these tool calls.",
+      "required": false,
+      "default": false
+    }
+  },
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"]
+  }
+}

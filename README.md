@@ -26,6 +26,15 @@ If your account has a single vehicle it is selected automatically; otherwise pas
 
 ## Installation
 
+### Option A: MCP bundle (easiest, Claude Desktop)
+
+1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) (the bundle uses it to fetch dependencies on first launch).
+2. Download `unofficial-polestar-mcp-<version>.mcpb` from the [latest release](https://github.com/uint16/unofficial-polestar-mcp/releases/latest).
+3. Double-click the file (or drag it into Claude Desktop → Settings → Extensions).
+4. Enter your Polestar email and password in the extension settings — the password is stored in your OS keychain, not in a config file. Unlock/open-windows tools stay disabled unless you flip the toggle.
+
+### Option B: from source
+
 Requires Python 3.11+.
 
 **macOS / Linux:**

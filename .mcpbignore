@@ -1,0 +1,10 @@
+.git
+.gitignore
+.venv
+dist
+build
+__pycache__
+*.pyc
+*.egg-info
+.mcpbignore
+*.mcpb
