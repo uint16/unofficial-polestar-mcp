@@ -1,6 +1,6 @@
 [project]
 name = "unofficial-polestar-mcp"
-version = "0.1.0"
+version = "0.2.0"
 description = "Unofficial MCP server for controlling your Polestar from any MCP-capable AI assistant — climate, charging, locks, location and vehicle status. Not affiliated with or endorsed by Polestar."
 readme = "README.md"
 license = "MIT"

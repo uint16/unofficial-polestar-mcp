@@ -2,7 +2,7 @@
   "manifest_version": "0.2",
   "name": "unofficial-polestar-mcp",
   "display_name": "Unofficial Polestar",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Control your Polestar: climate, charging, locks, location and vehicle status. Not affiliated with Polestar.",
   "long_description": "Unofficial MCP server that connects AI assistants to your Polestar — precondition the cabin, set charge limits, check battery and range, find where you parked, or flash the lights. Tools that expose the vehicle (unlock, open windows) are disabled unless explicitly enabled. Independent community project, not affiliated with, endorsed by, or supported by Polestar. Requires uv (https://docs.astral.sh/uv/) to be installed.",
   "author": {
