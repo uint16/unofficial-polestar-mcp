@@ -24,6 +24,17 @@ All tools carry MCP annotations: status tools are marked `readOnlyHint`, exposur
 
 If your account has a single vehicle it is selected automatically; otherwise pass a `vin` argument or set `POLESTAR_VIN`.
 
+### Command pre-flight behavior
+
+Before sending a command, the server:
+
+- **Serializes commands per vehicle** — one in-flight command per car, so parallel tool calls can't race each other.
+- **Checks reachability** — if the car is asleep it sends one wake-up and re-checks; if it's unreachable for another reason (in use, OTA update, …) the command is still sent and the result says so.
+- **Reads the relevant state first** and includes it in the result — e.g. `start_charging` reports charge level and charger connection, `lock_car` warns if a door, hood, or tailgate is open.
+- **Skips already-satisfied commands** — "start charging" while charging, "lock" while locked, or setting a charge limit to its current value returns `"command": "skipped"` with the reason instead of firing a redundant command.
+
+State reads are best-effort: if a pre-check read fails, the command is still sent and the result carries a warning — the Polestar backend remains the final validator.
+
 ## Installation
 
 ### Option A: MCP bundle (easiest, Claude Desktop)
